@@ -3,6 +3,8 @@ library(rpart)
 library(rattle)
 library(rpart.plot)
 library(RColorBrewer)
+library(randomForest)
+library(party)
 
 
 #Load datasets
@@ -93,3 +95,41 @@ combined$FamilyID2 <- combined$FamilyID
 combined$FamilyID2 <- as.character(combined$FamilyID2)
 combined$FamilyID2[combined$FamilySize <= 3] <- 'Small'
 combined$FamilyID2 <- factor(combined$FamilyID2)
+
+train <- combined[1:891,]
+test <- combined[892:1309,]
+
+
+train$Sex <- as.factor(train$Sex)
+test$Sex <- as.factor(test$Sex)
+
+set.seed(1234)
+
+fit <- randomForest(as.factor(Survived) ~ Pclass+Sex+Age+SibSp+Parch+Fare+Embarked+Title+FamilySize+
+                                                  FamilyID2,data = train,importance = T,ntree=200)
+
+
+common <- intersect(names(train),names(test))
+for(p in common){
+  if(class(train[[p]]) == 'factor'){
+    levels(test[[p]]) <- levels(train[[p]])
+  }
+}
+
+prediction <- predict(fit,test)
+
+
+
+set.seed(12345)
+
+fit <- cforest(as.factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + Fare +
+                 Embarked + Title + FamilySize + FamilyID,
+               data = train, 
+               controls=cforest_unbiased(ntree=2000, mtry=3))
+
+Prediction <- predict(fit, test, OOB=TRUE, type = "response")
+
+
+
+submit <- data.frame(PassengerId = test$PassengerId, Survived = Prediction)
+write.csv(submit, file = "firstforest.csv", row.names = FALSE)
