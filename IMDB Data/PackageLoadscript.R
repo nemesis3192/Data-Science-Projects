@@ -9,7 +9,9 @@ InstallAndOrLoad <- function(pkg){
 
 listOfRequiredPackages <- c("syuzhet","data.table","plyr","magrittr"
                             ,"openxlsx","dplyr","tidyr","rvest","stringr"
-                            ,"wordcloud","tm","twitteR","ROAuth","base64enc")
+                            ,"wordcloud","tm","twitteR","ROAuth","base64enc",
+                            "ggplot2","ggrepel","ggthemes","scales","car","GGally"
+                            ,"VIM","formattable","caret","plotly","corrplot")
 
 
 
